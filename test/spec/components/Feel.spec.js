@@ -64,6 +64,17 @@ describe('<FeelField>', function() {
     });
 
 
+    it('should render placeholder', function() {
+
+      // given
+      const result = createFeelField({ container, placeholder: 'foo' });
+
+      // then
+      const input = domQuery('[placeholder=foo]', result.container);
+      expect(input).to.exist;
+    });
+
+
     it('should update', function() {
 
       // given
@@ -1026,6 +1037,17 @@ describe('<FeelField>', function() {
     });
 
 
+    it('should render placeholder', function() {
+
+      // given
+      const result = createFeelTextArea({ container, placeholder: 'foo' });
+
+      // then
+      const input = domQuery('[placeholder=foo]', result.container);
+      expect(input).to.exist;
+    });
+
+
     // https://github.com/bpmn-io/bpmn-js-properties-panel/issues/810
     it('should be flagged with data-gramm="false"', function() {
 
@@ -1723,6 +1745,17 @@ describe('<FeelField>', function() {
     });
 
 
+    it('should render placeholder', function() {
+
+      // given
+      const result = createFeelField({ container, placeholder: 'foo', feel: 'required' });
+
+      // then
+      const input = domQuery('[role="textbox"]', result.container);
+      expect(input.textContent).to.eql('foo');
+    });
+
+
     it('should update', function() {
 
       // given
@@ -1937,7 +1970,7 @@ describe('<FeelField>', function() {
 
         // given
         const clock = sinon.useFakeTimers();
-        const result = createFeelField({ container, getValue: () => '= foo == bar', feel: 'required' });
+        const result = createFeelField({ container, getValue: () => '= ...syntax error...', feel: 'required' });
 
         // when
         // trigger debounced validation
@@ -1949,6 +1982,26 @@ describe('<FeelField>', function() {
           const errorField = domQuery('.bio-properties-panel-error', result.container);
           expect(errorField).to.exist;
           expect(errorField.textContent).to.eql('Unparsable FEEL expression.');
+        });
+      });
+
+
+      it('should not indicate field error on non-syntax errors', async function() {
+
+        // given
+        const clock = sinon.useFakeTimers();
+        const result = createFeelField({ container, getValue: () => '= friend[0]', feel: 'required' });
+
+        // when
+        // trigger debounced validation
+        await act(() => { clock.tick(1000); });
+        await act(() => { clock.restore(); });
+
+        // then
+        await waitFor(() => {
+          const entry = domQuery('.bio-properties-panel-entry', result.container);
+
+          expect(isValid(entry)).to.be.true;
         });
       });
 
@@ -2496,9 +2549,7 @@ describe('<FeelField>', function() {
     });
 
 
-    // TODO: fix a11y violations when feel editor supports content attribute extensions
-    // cf. https://github.com/bpmn-io/feel-editor/issues/36
-    it.skip('should have no violations (feel)', async function() {
+    it('should have no violations (feel)', async function() {
 
       // given
       this.timeout(5000);

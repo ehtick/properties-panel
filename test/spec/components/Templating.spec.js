@@ -77,6 +77,23 @@ describe('<Templating>', function() {
     });
 
 
+    it('should break line on very long text', async function() {
+
+      // given
+      const result = createTemplatingEntry({ container });
+
+      const input = domQuery('[role="textbox"]', result.container);
+
+      // when
+      await act(() => input.textContent = 'Muda '.repeat(200));
+
+      // then
+      return waitFor(() => {
+        expect(input.clientHeight).to.be.above(100);
+      });
+    });
+
+
     describe('#isEdited', function() {
 
       it('should NOT be edited', function() {
@@ -173,7 +190,7 @@ describe('<Templating>', function() {
       it('should show syntax error (FEEL)', async function() {
 
         // given
-        let result = createTemplatingEntry({ container, getValue: () => '= foo == bar' });
+        let result = createTemplatingEntry({ container, getValue: () => '= ...syntax error...' });
 
         // when
         await act(() => clock.tick(1000));
@@ -190,7 +207,7 @@ describe('<Templating>', function() {
       it('should show syntax error (feelers)', async function() {
 
         // given
-        const result = createTemplatingEntry({ container, getValue: () => 'Template {{foo == bar}}' });
+        const result = createTemplatingEntry({ container, getValue: () => 'Template {{...syntax error...}}' });
 
         // when
         // trigger debounced validation
@@ -233,7 +250,7 @@ describe('<Templating>', function() {
           id: 'foo',
           container,
           errors,
-          getValue: () => '= foo == bar'
+          getValue: () => '= ....syntax error....'
         });
 
         // assume
@@ -375,7 +392,7 @@ describe('<Templating>', function() {
       });
 
 
-      it('should set invalid', async function() {
+      it('should NOT discard invalid input', async function() {
 
         // given
         const setValueSpy = sinon.spy();

@@ -12,7 +12,8 @@ import TestContainer from 'mocha-test-container-support';
 import EventBus from 'diagram-js/lib/core/EventBus';
 
 import {
-  query as domQuery
+  query as domQuery,
+  queryAll as domQueryAll
 } from 'min-dom';
 
 import {
@@ -78,6 +79,49 @@ describe('<FeelPopup>', function() {
   });
 
 
+  it('should render links', async function() {
+
+    // given
+    const parent = document.createElement('div');
+
+    // when
+    createFeelPopup({
+      popupContainer: parent,
+      getPopupLinks: (type) => {
+        if (type === 'foo') {
+          return [
+            { href: 'https://foo.com/', title: 'Foo' },
+            { href: 'https://bar.com/', title: 'Bar' }
+          ];
+        }
+
+        return [];
+      },
+      type: 'foo'
+    }, container);
+
+    const childComponent = domQuery('.child-component', container);
+
+    const btn = domQuery('button', childComponent);
+
+    // when
+    await act(() => {
+      btn.click();
+    });
+
+    // then
+    const links = domQueryAll('.bio-properties-panel-feel-popup__title-link', parent);
+
+    expect(links.length).to.equal(2);
+
+    expect(links[0].href).to.equal('https://foo.com/');
+    expect(links[0].textContent).to.equal('Foo');
+
+    expect(links[1].href).to.equal('https://bar.com/');
+    expect(links[1].textContent).to.equal('Bar');
+  });
+
+
   it('should restore focus on source element', async function() {
 
     // given
@@ -90,7 +134,7 @@ describe('<FeelPopup>', function() {
       btn.click();
     });
 
-    const closeBtn = domQuery('.bio-properties-panel-feel-popup__close-btn', document.body);
+    const closeBtn = domQuery('.bio-properties-panel-popup__close', document.body);
 
     // when
     await act(() => {
@@ -412,25 +456,6 @@ describe('<FeelPopup>', function() {
     });
 
 
-    it('should link to <feel> documentation', async function() {
-
-      // given
-      createFeelPopup({ type: 'feel' }, container);
-
-      const childComponent = domQuery('.child-component', container);
-      const btn = domQuery('button', childComponent);
-
-      // when
-      await act(() => {
-        btn.click();
-      });
-
-      // then
-      const link = domQuery('.bio-properties-panel-feel-popup__title-link', document.body);
-      expect(link).to.exist;
-    });
-
-
     it('should focus <feel> editor', async function() {
 
       // given
@@ -550,7 +575,7 @@ describe('<FeelPopup>', function() {
       // assume
       expect(getFeelEditor(document.body)).to.exist;
 
-      const closeBtn = domQuery('.bio-properties-panel-feel-popup__close-btn', document.body);
+      const closeBtn = domQuery('.bio-properties-panel-popup__close', document.body);
 
       // when
       await act(() => {
@@ -584,25 +609,6 @@ describe('<FeelPopup>', function() {
 
       // then
       expect(getFeelersEditor(document.body)).to.exist;
-    });
-
-
-    it('should link to <feelers> documentation', async function() {
-
-      // given
-      createFeelPopup({ type: 'feelers' }, container);
-
-      const childComponent = domQuery('.child-component', container);
-      const btn = domQuery('button', childComponent);
-
-      // when
-      await act(() => {
-        btn.click();
-      });
-
-      // then
-      const link = domQuery('.bio-properties-panel-feel-popup__title-link', document.body);
-      expect(link).to.exist;
     });
 
 
@@ -663,7 +669,7 @@ describe('<FeelPopup>', function() {
       // assume
       expect(getFeelersEditor(document.body)).to.exist;
 
-      const closeBtn = domQuery('.bio-properties-panel-feel-popup__close-btn', document.body);
+      const closeBtn = domQuery('.bio-properties-panel-popup__close', document.body);
 
       // when
       await act(() => {
@@ -738,13 +744,14 @@ describe('<FeelPopup>', function() {
 function createFeelPopup(props, container) {
   const {
     popupContainer,
+    getPopupLinks,
     element = noopElement,
     eventBus = new EventBus(),
     type
   } = props;
 
   return render(
-    <FEELPopupRoot popupContainer={ popupContainer } element={ element } eventBus={ eventBus }>
+    <FEELPopupRoot popupContainer={ popupContainer } getPopupLinks={ getPopupLinks } element={ element } eventBus={ eventBus }>
       <ChildComponent type={ type } />
     </FEELPopupRoot>,
     { container }

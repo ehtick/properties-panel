@@ -11,11 +11,6 @@ import Tooltip from './entries/Tooltip';
 import classnames from 'classnames';
 
 import {
-  find,
-  sortBy
-} from 'min-dash';
-
-import {
   useErrors,
   useLayoutState,
   usePrevious
@@ -32,6 +27,8 @@ import { PropertiesPanelContext } from '../context';
 
 import { useStickyIntersectionObserver } from '../hooks';
 
+import translateFallback from './util/translateFallback';
+
 const noop = () => {};
 
 /**
@@ -44,122 +41,48 @@ export default function ListGroup(props) {
     id,
     items,
     label,
-    shouldOpen = true,
-    shouldSort = true
+    shouldOpen = false,
+    translate = translateFallback
   } = props;
 
+  useEffect(() => {
+    if (props.shouldSort != undefined) {
+      console.warn('the property \'shouldSort\' is no longer supported');
+    }
+  }, [ props.shouldSort ]);
 
   const groupRef = useRef(null);
 
   const [ open, setOpen ] = useLayoutState(
     [ 'groups', id, 'open' ],
-    false
+    shouldOpen
   );
 
   const [ sticky, setSticky ] = useState(false);
 
   const onShow = useCallback(() => setOpen(true), [ setOpen ]);
 
-  const [ ordering, setOrdering ] = useState([]);
-  const [ newItemAdded, setNewItemAdded ] = useState(false);
+  const [ localItems, setLocalItems ] = useState([]);
 
   // Flag to mark that add button was clicked in the last render cycle
   const [ addTriggered, setAddTriggered ] = useState(false);
 
-  const prevItems = usePrevious(items);
   const prevElement = usePrevious(element);
 
-  const elementChanged = element !== prevElement;
-  const shouldHandleEffects = !elementChanged && (shouldSort || shouldOpen);
+  const toggleOpen = useCallback(() => setOpen(!open), [ open ]);
 
-  // reset initial ordering when element changes (before first render)
-  if (elementChanged) {
-    setOrdering(createOrdering(shouldSort ? sortItems(items) : items));
-  }
+  const openItemIds = (element === prevElement && open && addTriggered)
+    ? getNewItemIds(items, localItems)
+    : [];
 
-  // keep ordering in sync to items - and open changes
-
-  // (0) set initial ordering from given items
+  // reset local state after items changed
   useEffect(() => {
-    if (!prevItems || !shouldSort) {
-      setOrdering(createOrdering(items));
-    }
-  }, [ items, element ]);
-
-  // (1) items were added
-  useEffect(() => {
-
-    // reset addTriggered flag
+    setLocalItems(items);
     setAddTriggered(false);
-
-    if (shouldHandleEffects && prevItems && items.length > prevItems.length) {
-
-      let add = [];
-
-      items.forEach(item => {
-        if (!ordering.includes(item.id)) {
-          add.push(item.id);
-        }
-      });
-
-      let newOrdering = ordering;
-
-      // open if not open, configured and triggered by add button
-      //
-      // TODO(marstamm): remove once we refactor layout handling for listGroups.
-      // Ideally, opening should be handled as part of the `add` callback and
-      // not be a concern for the ListGroup component.
-      if (addTriggered && !open && shouldOpen) {
-        toggleOpen();
-      }
-
-      // filter when not open and configured
-      if (!open && shouldSort) {
-        newOrdering = createOrdering(sortItems(items));
-      }
-
-      // add new items on top or bottom depending on sorting behavior
-      newOrdering = newOrdering.filter(item => !add.includes(item));
-      if (shouldSort) {
-        newOrdering.unshift(...add);
-      } else {
-        newOrdering.push(...add);
-      }
-
-      setOrdering(newOrdering);
-      setNewItemAdded(addTriggered);
-    } else {
-      setNewItemAdded(false);
-    }
-  }, [ items, open, shouldHandleEffects, addTriggered ]);
-
-  // (2) sort items on open if shouldSort is set
-  useEffect(() => {
-
-    if (shouldSort && open && !newItemAdded) {
-      setOrdering(createOrdering(sortItems(items)));
-    }
-  }, [ open, shouldSort ]);
-
-  // (3) items were deleted
-  useEffect(() => {
-    if (shouldHandleEffects && prevItems && items.length < prevItems.length) {
-      let keep = [];
-
-      ordering.forEach(o => {
-        if (getItem(items, o)) {
-          keep.push(o);
-        }
-      });
-
-      setOrdering(keep);
-    }
-  }, [ items, shouldHandleEffects ]);
+  }, [ items ]);
 
   // set css class when group is sticky to top
   useStickyIntersectionObserver(groupRef, 'div.bio-properties-panel-scroll-container', setSticky);
-
-  const toggleOpen = () => setOpen(!open);
 
   const hasItems = !!items.length;
 
@@ -170,6 +93,8 @@ export default function ListGroup(props) {
 
   const handleAddClick = e => {
     setAddTriggered(true);
+    setOpen(true);
+
     add(e);
   };
 
@@ -185,8 +110,8 @@ export default function ListGroup(props) {
 
     // also check if the error is nested, e.g. for name-value entries
     return item.entries.some(entry => allErrors[entry.id]);
-  }
-  );
+  });
+
 
   return <div class="bio-properties-panel-group" data-group-id={ 'group-' + id } ref={ groupRef }>
     <div
@@ -212,14 +137,14 @@ export default function ListGroup(props) {
             ? (
               <button
                 type="button"
-                title="Create new list item"
+                title={ translate('Create new list item') }
                 class="bio-properties-panel-group-header-button bio-properties-panel-add-entry"
                 onClick={ handleAddClick }
               >
                 <CreateIcon />
                 {
                   !hasItems ? (
-                    <span class="bio-properties-panel-add-entry-label">Create</span>
+                    <span class="bio-properties-panel-add-entry-label">{ translate('Create') }</span>
                   )
                     : null
                 }
@@ -231,7 +156,7 @@ export default function ListGroup(props) {
           hasItems
             ? (
               <div
-                title={ `List contains ${items.length} item${items.length != 1 ? 's' : ''}` }
+                title={ translate(`List contains {numOfItems} item${items.length != 1 ? 's' : ''}`, { numOfItems: items.length }) }
                 class={
                   classnames(
                     'bio-properties-panel-list-badge',
@@ -249,7 +174,7 @@ export default function ListGroup(props) {
             ? (
               <button
                 type="button"
-                title="Toggle section"
+                title={ translate('Toggle section') }
                 class="bio-properties-panel-group-header-button bio-properties-panel-arrow"
               >
                 <ArrowIcon class={ open ? 'bio-properties-panel-arrow-down' : 'bio-properties-panel-arrow-right' } />
@@ -266,9 +191,7 @@ export default function ListGroup(props) {
       <PropertiesPanelContext.Provider value={ propertiesPanelContext }>
 
         {
-          ordering.map((o, index) => {
-            const item = getItem(items, o);
-
+          items.map((item, index) => {
             if (!item) {
               return;
             }
@@ -276,8 +199,9 @@ export default function ListGroup(props) {
             const { id } = item;
 
             // if item was added, open it
-            // Existing items will not be affected as autoOpen is only applied on first render
-            const autoOpen = newItemAdded;
+            // existing items will not be affected as autoOpen
+            // is only applied on first render
+            const autoOpen = openItemIds.includes(item.id);
 
             return (
               <ListItem
@@ -285,7 +209,8 @@ export default function ListGroup(props) {
                 autoOpen={ autoOpen }
                 element={ element }
                 index={ index }
-                key={ id } />
+                key={ id }
+                translate={ translate } />
             );
           })
         }
@@ -295,19 +220,9 @@ export default function ListGroup(props) {
 }
 
 
-// helpers ////////////////////
+function getNewItemIds(newItems, oldItems) {
+  const newIds = newItems.map(item => item.id);
+  const oldIds = oldItems.map(item => item.id);
 
-/**
- * Sorts given items alphanumeric by label
- */
-function sortItems(items) {
-  return sortBy(items, i => i.label.toLowerCase());
-}
-
-function getItem(items, id) {
-  return find(items, i => i.id === id);
-}
-
-function createOrdering(items) {
-  return items.map(i => i.id);
+  return newIds.filter(itemId => !oldIds.includes(itemId));
 }

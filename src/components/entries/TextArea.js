@@ -11,7 +11,8 @@ import classnames from 'classnames';
 
 import {
   useError,
-  useShowEntryEvent
+  useShowEntryEvent,
+  useElementVisible,
 } from '../../hooks';
 
 import { isFunction } from 'min-dash';
@@ -37,7 +38,8 @@ function TextArea(props) {
     monospace,
     onFocus,
     onBlur,
-    autoResize,
+    autoResize = true,
+    placeholder,
     rows = autoResize ? 1 : 2,
     tooltip
   } = props;
@@ -45,6 +47,8 @@ function TextArea(props) {
   const [ localValue, setLocalValue ] = useState(value);
 
   const ref = useShowEntryEvent(id);
+
+  const visible = useElementVisible(ref.current);
 
   const handleInputCallback = useMemo(() => {
     return debounce((target) => onInput(target.value.length ? target.value : undefined));
@@ -61,6 +65,10 @@ function TextArea(props) {
   useLayoutEffect(() => {
     autoResize && resizeToContents(ref.current);
   }, []);
+
+  useLayoutEffect(() => {
+    visible && autoResize && resizeToContents(ref.current);
+  }, [ visible ]);
 
   useEffect(() => {
     if (value === localValue) {
@@ -90,6 +98,7 @@ function TextArea(props) {
         onInput={ handleInput }
         onFocus={ onFocus }
         onBlur={ onBlur }
+        placeholder={ placeholder }
         rows={ rows }
         value={ localValue }
         disabled={ disabled }
@@ -130,6 +139,7 @@ export default function TextAreaEntry(props) {
     validate,
     onFocus,
     onBlur,
+    placeholder,
     autoResize,
     tooltip
   } = props;
@@ -181,6 +191,7 @@ export default function TextAreaEntry(props) {
         debounce={ debounce }
         monospace={ monospace }
         disabled={ disabled }
+        placeholder={ placeholder }
         autoResize={ autoResize }
         tooltip={ tooltip }
         element={ element } />

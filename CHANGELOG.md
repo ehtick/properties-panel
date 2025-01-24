@@ -6,6 +6,83 @@ All notable changes to [`@bpmn-io/properties-panel`](https://github.com/bpmn-io/
 
 ___Note:__ Yet to be released changes appear here._
 
+## 3.26.0
+
+* `FEAT`: suggest latest Camunda FEEL built-ins ([@bpmn-io/feel-editor#65](https://github.com/bpmn-io/feel-editor/pull/65))
+* `DEPS`: update to `@bpmn-io/feel-editor@1.10.0`
+
+## 3.25.1
+
+* `FEAT`: support for `diagram-js` v15
+* `FIX`: add focus to checkboxes and buttons ([#390](https://github.com/bpmn-io/properties-panel/pull/390))
+
+## 3.25.0
+
+* `FEAT`: links shown in FEEL popup are configurable ([#382](https://github.com/bpmn-io/properties-panel/pull/382))
+
+## 3.24.1
+
+* `FIX`: validate first item access gracefully ([#381](https://github.com/bpmn-io/properties-panel/pull/381))
+
+## 3.24.0
+
+* `FEAT`: lint first item access ([feel-lint#25](https://github.com/bpmn-io/feel-lint/issues/25)
+* `FEAT`: suggest Camunda 8.6 FEEL built-ins
+* `DEPS`: update to `@bpmn-io/feel-editor@1.9.0`
+
+## 3.23.0
+
+* `FEAT`: make text area auto resize by default ([#377](https://github.com/bpmn-io/properties-panel/pull/377))
+
+## 3.22.4
+
+* `CHORE`: add styles for tooltip headings ([#376](https://github.com/bpmn-io/properties-panel/pull/376))
+
+## 3.22.3
+
+* `FIX`: fix text area autoresize behavior ([#374](https://github.com/bpmn-io/properties-panel/pull/374))
+
+## 3.22.2
+
+* `CHORE`: revert autoresize of text area ([#372](https://github.com/bpmn-io/properties-panel/pull/372))
+
+## 3.22.1
+
+* `FIX`: text area will auto resize on every render ([#372](https://github.com/bpmn-io/properties-panel/pull/372))
+
+## 3.22.0
+
+* `FIX`: do not render `ListGroup` with outdated components ([#369](https://github.com/bpmn-io/properties-panel/pull/369))
+* `DEPS`: update to `@bpmn-io/feel-editor@1.6.0`
+* `CHORE`: rework `ListGroup` auto open logic ([#369](https://github.com/bpmn-io/properties-panel/pull/369))
+
+## 3.21.0
+
+* `FEAT`: add translation option to `List` and `Collapsible` ([#362](https://github.com/bpmn-io/properties-panel/pull/362))
+
+## 3.20.1
+
+* `FIX`: move popup close button to header ([#364](https://github.com/bpmn-io/properties-panel/issues/364))
+* `FIX`: correct popout icon for template editor ([#342](https://github.com/bpmn-io/properties-panel/issues/342))
+* `FIX`: wrap lines in FEEL template editor ([#365](https://github.com/bpmn-io/properties-panel/issues/365))
+
+## 3.20.0
+
+* `FEAT`: support `placeholder` property in text and FEEL text entries ([#363](https://github.com/bpmn-io/properties-panel/pull/363))
+* `DEPS`: update to `@bpmn-io/feel-editor@1.5.0`
+
+## 3.19.0
+
+* `FEAT`: do not sort list items alphabetically ([#311](https://github.com/bpmn-io/properties-panel/issues/311))
+* `FEAT`: scroll focused list item entry into view ([#360](https://github.com/bpmn-io/properties-panel/pull/360))
+* `CHORE`: remove `shouldSort` behavior for list groups ([#353](https://github.com/bpmn-io/properties-panel/pull/353))
+* `CHORE`: remove `compareFn` prop for `List` component, the caller may decide on insertion points of new items ([#353](https://github.com/bpmn-io/properties-panel/pull/353))
+
+## 3.18.2
+
+* `FIX`: provide accessible label to FEEL editor ([#349](https://github.com/bpmn-io/properties-panel/pull/349))
+* `DEPS`: update to `@bpmn-io/feel-editor@1.3.0`
+
 ## 3.18.1
 
 * `FIX`: correctly place popup editor toggle in feelers editor ([#341](https://github.com/bpmn-io/properties-panel/pull/341))
@@ -84,7 +161,7 @@ ___Note:__ Yet to be released changes appear here._
 
 ## 3.7.1
 
-* `FIX`: remove `undefined` in FEEL popup label ([#288](https://github.com/bpmn-io/properties-panel/pull/288)) 
+* `FIX`: remove `undefined` in FEEL popup label ([#288](https://github.com/bpmn-io/properties-panel/pull/288))
 
 ## 3.7.0
 
@@ -103,7 +180,7 @@ ___Note:__ Yet to be released changes appear here._
 
 ## 3.4.0
 
-* `CHORE`: publish css in `dist/assets` 
+* `CHORE`: publish css in `dist/assets`
 
 ## 3.3.2
 
@@ -151,7 +228,7 @@ __Breaking Changes__
 
 * `FIX`: improve FX toggle styles ([#249](https://github.com/bpmn-io/properties-panel/pull/249))
 
-## 2.2.0 
+## 2.2.0
 
 * `FEAT`: add FEEL entry for number field ([#248](https://github.com/bpmn-io/properties-panel/pull/248))
 
