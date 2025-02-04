@@ -35,7 +35,7 @@ import { ToggleSwitch } from '../ToggleSwitch';
 import { NumberField } from '../NumberField';
 import Tooltip from '../Tooltip';
 
-const noop = () => { };
+const noop = () => {};
 
 function FeelTextfieldComponent(props) {
   const {
@@ -46,6 +46,7 @@ function FeelTextfieldComponent(props) {
     hostLanguage,
     onInput,
     onError,
+    placeholder,
     feel,
     value = '',
     disabled = false,
@@ -129,14 +130,15 @@ function FeelTextfieldComponent(props) {
     }
   };
 
-  const handleLint = useStaticCallback(lint => {
+  const handleLint = useStaticCallback((lint = []) => {
 
-    if (!(lint && lint.length)) {
+    const syntaxError = lint.some(report => report.type === 'Syntax Error');
+
+    if (syntaxError) {
+      onError('Unparsable FEEL expression.');
+    } else {
       onError(undefined);
-      return;
     }
-
-    onError('Unparsable FEEL expression.');
   });
 
   const handlePopupOpen = (type = 'feel') => {
@@ -236,14 +238,15 @@ function FeelTextfieldComponent(props) {
         />
         {feelActive ?
           <CodeEditor
-            id={ prefixId(id) }
             name={ id }
             onInput={ handleLocalInput }
+            contentAttributes={ { 'id': prefixId(id), 'aria-label': label } }
             disabled={ disabled }
             popupOpen={ popuOpen }
             onFeelToggle={ () => { handleFeelToggle(); setFocus(true); } }
             onLint={ handleLint }
             onPopupOpen={ handlePopupOpen }
+            placeholder={ placeholder }
             value={ feelOnlyValue }
             variables={ variables }
             ref={ editorRef }
@@ -274,7 +277,8 @@ const OptionalFeelInput = forwardRef((props, ref) => {
     onInput,
     value,
     onFocus,
-    onBlur
+    onBlur,
+    placeholder
   } = props;
 
   const inputRef = useRef();
@@ -311,6 +315,7 @@ const OptionalFeelInput = forwardRef((props, ref) => {
     onInput={ e => onInput(e.target.value) }
     onFocus={ onFocus }
     onBlur={ onBlur }
+    placeholder={ placeholder }
     value={ value || '' } />;
 });
 
@@ -375,7 +380,8 @@ const OptionalFeelTextArea = forwardRef((props, ref) => {
     onInput,
     value,
     onFocus,
-    onBlur
+    onBlur,
+    placeholder
   } = props;
 
   const inputRef = useRef();
@@ -406,6 +412,7 @@ const OptionalFeelTextArea = forwardRef((props, ref) => {
     onInput={ e => onInput(e.target.value) }
     onFocus={ onFocus }
     onBlur={ onBlur }
+    placeholder={ placeholder }
     value={ value || '' }
     data-gramm="false"
   />;
@@ -507,6 +514,7 @@ const OptionalFeelCheckbox = forwardRef((props, ref) => {
  * @param {Function} props.variables
  * @param {Function} props.onFocus
  * @param {Function} props.onBlur
+ * @param {string} [props.placeholder]
  * @param {string|import('preact').Component} props.tooltip
  */
 export default function FeelEntry(props) {
@@ -529,6 +537,7 @@ export default function FeelEntry(props) {
     variables,
     onFocus,
     onBlur,
+    placeholder,
     tooltip
   } = props;
 
@@ -588,6 +597,7 @@ export default function FeelEntry(props) {
         onError={ onError }
         onFocus={ onFocus }
         onBlur={ onBlur }
+        placeholder={ placeholder }
         example={ example }
         hostLanguage={ hostLanguage }
         singleLine={ singleLine }
@@ -647,6 +657,7 @@ export function FeelNumberEntry(props) {
  * @param {Function} props.variables
  * @param {Function} props.onFocus
  * @param {Function} props.onBlur
+ * @param {string} [props.placeholder]
  */
 export function FeelTextAreaEntry(props) {
   return <FeelEntry class="bio-properties-panel-feel-textarea" OptionalComponent={ OptionalFeelTextArea } { ...props } />;
@@ -776,7 +787,7 @@ function withAutoClosePopup(Component) {
       return () => {
         closePopup({ id });
       };
-    }, [ ]);
+    }, []);
 
     return <Component { ...props } />;
   };

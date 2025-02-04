@@ -15,13 +15,14 @@
   --color-grey-0-0-22: hsl(0, 0%, 22%);
 
   --color-blue-205-100-35: hsl(205, 100%, 35%);
+  --color-blue-205-100-40: hsl(205, 100%, 40%);
+  --color-green-150-86-44: hsl(150, 86%, 44%);
   --color-blue-205-100-45: hsl(205, 100%, 45%);
   --color-blue-205-100-50: hsl(205, 100%, 50%);
-  --color-blue-205-100-85: hsl(205, 100%, 85%);
-  --color-blue-205-100-95: hsl(205, 100%, 95%);
   --color-blue-219-99-53: hsl(219, 99%, 53%);
   --color-blue-218-100-74: hsl(218, 100%, 74%);
-  --color-green-150-86-44: hsl(150, 86%, 44%);
+  --color-blue-205-100-85: hsl(205, 100%, 85%);
+  --color-blue-205-100-95: hsl(205, 100%, 95%);
 
   --color-red-360-100-40: hsl(360, 100%, 40%);
   --color-red-360-100-45: hsl(360, 100%, 45%);
@@ -78,6 +79,7 @@
 
   --input-focus-background-color: var(--color-blue-205-100-95);
   --input-focus-border-color: var(--color-blue-205-100-50);
+  --focus-outline-color: var(--color-blue-205-100-40);
 
   --input-error-background-color: var(--color-red-360-100-97);
   --input-error-border-color: var(--color-red-360-100-45);
@@ -297,6 +299,11 @@
   padding: 0 3px;
   border: none;
   background: none;
+}
+
+.bio-properties-panel-group-header-button:focus {
+  outline-offset: 2px;
+  outline-color: var(--focus-outline-color);
 }
 
 .bio-properties-panel-group-header-buttons .bio-properties-panel-group-header-buttons:last-child {
@@ -537,8 +544,9 @@ select.bio-properties-panel-input {
 }
 
 .bio-properties-panel-input[type="checkbox"]:focus {
-  outline: 2px solid var(--input-focus-border-color);
-  outline-offset: 0;
+  outline: auto;
+  outline-color: var(--focus-outline-color);
+  outline-offset: 2px;
 }
 
 .bio-properties-panel-checkbox > .bio-properties-panel-label {
@@ -1183,6 +1191,12 @@ textarea.bio-properties-panel-input {
   white-space: pre-wrap;
 }
 
+.bio-properties-panel-tooltip-content h1 {
+  font-size: var(--text-size-base);
+  font-weight: bold;
+  margin: 0;
+}
+
 .bio-properties-panel-tooltip-content code,
 .bio-properties-panel-tooltip-content pre {
   color: var(--description-color);
@@ -1334,6 +1348,31 @@ textarea.bio-properties-panel-input {
   text-transform: capitalize;
 }
 
+.bio-properties-panel-popup .bio-properties-panel-popup__close {
+  margin: -12px;
+  margin-left: 12px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: var(--popup-header-background-color);
+}
+
+.bio-properties-panel-popup .bio-properties-panel-popup__close:hover,
+.bio-properties-panel-popup .bio-properties-panel-popup__close:focus-visible {
+  background-color: var(--popup-background-color);
+}
+
+.bio-properties-panel-popup .bio-properties-panel-popup__close:focus-visible {
+  outline-offset: -2px;
+}
+
+.bio-properties-panel-popup .bio-properties-panel-popup__close svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  margin-top: 2px;
+}
+
 .bio-properties-panel-popup .bio-properties-panel-popup__header .bio-properties-panel-popup__drag-handle svg {
   margin-left: -4px;
 }
@@ -1366,8 +1405,12 @@ textarea.bio-properties-panel-input {
 }
 
 .bio-properties-panel-feel-popup__title-link {
-  margin-left: auto; 
+  margin-left: 8px; 
   display: flex;
+}
+
+.bio-properties-panel-feel-popup__title-link:first-of-type {
+  margin-left: auto;
 }
 
 .bio-properties-panel-feel-popup__title-link svg {
